@@ -1,0 +1,96 @@
+[package]
+name = "automated-reasoning-toolkit"
+description = "A SDK for (symbolic) automated reasoning techniques and a common interface to several solver backends"
+version = "0.1.0"
+keywords = ["automated", "symbolic", "reasoning", "logic"]
+homepage = "https://github.com/chaluli/automated-reasoning-toolkit"
+categories = ["security", "data-structures", "parsing", "mathematics"]
+
+rust-version = "1.90"
+license = "Apache-2.0"
+edition = "2021"
+repository = "https://github.com/chaluli/automated-reasoning-toolkit"
+
+[features]
+default = ["num-backend"]
+num-backend = ["dep:num-bigint", "dep:num-rational", "dep:num-traits", "dep:num-integer"]
+gmp = ["dep:rug"]
+
+# docs.rs builds with --all-features by default, which would trip the
+# mutually-exclusive feature guard in src/num/mod.rs. Override that and
+# document only the default num-backend; the gmp backend exposes the
+# same public API.
+[package.metadata.docs.rs]
+all-features = false
+features = []
+
+[dependencies]
+num-bigint = { version = "0.4", optional = true }
+num-rational = { version = "0.4", optional = true }
+num-traits = { version = "0.2", optional = true }
+num-integer = { version = "0.1", optional = true }
+rug = { version = "1.26", optional = true }
+hashbrown = "0.15"
+
+[dev-dependencies]
+
+# Enable global integer overflow detection for the release profile
+[profile.release]
+overflow-checks = true
+
+[profile.bench]
+overflow-checks = true
+debug = "line-tables-only"  # this adds more debug symbols/info to the binary than the default for `release` (which is `none`)
+
+[lints.rust]
+unsafe_code = "forbid"
+unexpected_cfgs = { level = 'deny', check-cfg = ['cfg(kani)', 'cfg(fuzzing)'] }
+missing_debug_implementations = "deny"
+rust-2018-idioms = "deny"
+unused_assignments = "allow"
+
+[lints.clippy]
+# Enabling some pedantic lints incrementally
+cast_lossless = "warn"
+cast_possible_truncation = "warn"
+cloned_instead_of_copied = "warn"
+format_collect = "warn"
+format_push_string = "warn"
+implicit_clone = "warn"
+inconsistent_struct_constructor = "warn"
+inefficient_to_string = "warn"
+large_types_passed_by_value = "warn"
+needless_pass_by_value = "warn"
+option_as_ref_cloned = "warn"
+option_option = "warn"
+redundant_clone = "deny"
+ref_option = "warn"
+ref_option_ref = "warn"
+trivially_copy_pass_by_ref = "warn"
+
+# When overriding lints, require `expect` instead of `allow`, and require a reason
+allow_attributes = "deny"
+allow_attributes_without_reason = "deny"
+should_panic_without_expect = "deny"
+
+# These lints may be worth enforcing, but cause a lot of noise at the moment.
+use_self = "allow"
+option_if_let_else = "allow"
+redundant_pub_crate = "allow"
+too_long_first_doc_paragraph = "allow"
+# We don't want to enforce these lints.
+missing_const_for_fn = "allow"
+needless_doctest_main = "allow"
+result_large_err = "allow"
+large_enum_variant = "allow"
+
+# Error on potential panics
+unwrap_used = "deny"
+expect_used = "deny"
+fallible_impl_from = "deny"
+unreachable = "deny"
+indexing_slicing = "deny"
+string_slice = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
